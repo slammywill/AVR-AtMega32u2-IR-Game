@@ -7,7 +7,6 @@
 #include "../fonts/font5x7_1.h"
 #include "button.h"
 #include "pio.h"
-#include <stdlib.h>
 
 #define LOOP_RATE 250
 
@@ -104,15 +103,12 @@ int main(void)
 
     while (1)
     {
-        printf("%d", correctCount);
         button_task();
 
         /* Pace the loop.  */
         pacer_wait();
         clear_screen();
         navswitch_update();
-
-        current_tick++;
 
         if (current_tick % arrow_speed == 0) {
             arrow_y++;
@@ -131,8 +127,14 @@ int main(void)
         // nav.h
         move(arrow_x, arrow_y, &correctCount);
 
-        if (correctCount == 2)
+        if (correctCount >= 0) {
             led_set(LED1, 1);
+        }
+        if (correctCount == 0) {
+            led_set(LED1, 0);
+        }
+
+        current_tick++;
 
     }
 }
