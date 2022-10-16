@@ -1,16 +1,13 @@
 #include "system.h"
 #include "navswitch.h"
-#include <stdio.h>
 
 #include "nav.h"
 
 void move(int arrow_x, int arrow_y, int* correctCount) {
 
-    int y_check = 1;
-
     // LEFT
     if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
-        if (arrow_y >= y_check && arrow_x == 1) {
+        if (arrow_y == 6 && arrow_x == 3) {
             (*correctCount)++;
         }
         else {
@@ -20,7 +17,7 @@ void move(int arrow_x, int arrow_y, int* correctCount) {
 
     // RIGHT
     else if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
-        if (arrow_y >= y_check && arrow_x == 3) {
+        if (arrow_y == 6 && arrow_x == 1) {
             (*correctCount)++;
         }
         else {
@@ -29,7 +26,7 @@ void move(int arrow_x, int arrow_y, int* correctCount) {
     }
     // LEFT-MIDDLE
     else if (navswitch_push_event_p(NAVSWITCH_EAST)) {
-        if (arrow_y >= y_check && arrow_x == 0) {
+        if (arrow_y == 6 && arrow_x == 4) {
             (*correctCount)++;
         }
         else {
@@ -38,7 +35,7 @@ void move(int arrow_x, int arrow_y, int* correctCount) {
     }
     // RIGHT-MIDDLE
     else if (navswitch_push_event_p(NAVSWITCH_WEST)) {
-        if (arrow_y >= y_check && arrow_x == 4) {
+        if (arrow_y == 6 && arrow_x == 0) {
             (*correctCount)++;
         }
         else {
@@ -47,7 +44,7 @@ void move(int arrow_x, int arrow_y, int* correctCount) {
     }
     // MIDDLE
     else if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-        if (arrow_y >= y_check && arrow_x == 2) {
+        if (arrow_y == 6 && arrow_x == 2) {
             (*correctCount)++;
         }
         else {
