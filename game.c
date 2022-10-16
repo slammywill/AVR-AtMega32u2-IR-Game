@@ -116,16 +116,18 @@ int main(void)
 
     int correctCount = 0;
     int wrongMove = 0;
+    bool gameOver = false;
     bool lost = false;
 
     while (1)
     {
         if (wrongMove == 3) {
+            gameOver = true;
             lost = true;
         }
 
         // RANDOMLY CHOOSES POSITION WHERE A DOT WILL FALL, 
-        if (!lost) {
+        if (!gameOver) {
             // PACE THE LOOP & CLEARS THE LOOP
             pacer_wait();
             clear_screen();
@@ -159,9 +161,14 @@ int main(void)
 
             current_tick++;
 
-        } else if (lost) {
+        } else if (gameOver) {
             // ADD LOSE SCREEN
-            tinygl_text("YOU LOSE!");
+            if (lost) {
+                tinygl_text("YOU LOSE!");
+            }
+            else {
+                tinygl_text("YOU WIN!");
+            }
             tinygl_update();
         }
     }
