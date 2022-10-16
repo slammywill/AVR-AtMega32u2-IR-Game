@@ -7,8 +7,13 @@
 #include "../fonts/font5x7_1.h"
 #include "button.h"
 #include "pio.h"
+#include <stdlib.h>
+#include "tinygl.h"
+#include "../fonts/font5x7_1.h"
 
+#define MESSAGE_RATE 25
 #define LOOP_RATE 250
+#define PACER_RATE 500
 
 static pio_t ledmat_rows[] =
 {
@@ -64,6 +69,7 @@ static void clear_screen(void) {
 }
 
 static int arrow_speed = 60;
+static bool sabotagePowerUp = false;
 
 static void button_task_init(void)
 {
@@ -71,13 +77,13 @@ static void button_task_init(void)
 }
 
 
-static void button_task(void)
-{
+static void button_task(void) {
     button_update();
 
-    if (button_push_event_p(BUTTON1))
-    {
-        arrow_speed = arrow_speed - (arrow_speed / 10);
+    if (button_push_event_p(BUTTON1) && sabotagePowerUp) {
+        arrow_speed = arrow_speed - (arrow_speed / 20);
+        sabotagePowerUp = false;
+        led_set(LED1, 0);
     }
 }
 
@@ -88,10 +94,10 @@ int main(void)
 
     /* TODO: Initialise the pins of the LED matrix.  */
     ledmat_init();
+    button_task_init();
 
     /* Initialize  */
     pacer_init(LOOP_RATE);
-    button_task_init();
 
     int delay = 1000;
     int current_tick = 0;
@@ -100,41 +106,57 @@ int main(void)
     int arrow_y = 0;
 
     int correctCount = 0;
+    int wrongMove = 0;
+    bool lost = false;
 
     while (1)
     {
-        button_task();
 
-        /* Pace the loop.  */
-        pacer_wait();
-        clear_screen();
-        navswitch_update();
-
-        if (current_tick % arrow_speed == 0) {
-            arrow_y++;
+        if (wrongMove == 3) {
+            lost = true;
         }
 
-        if (arrow_y >= 7) {
-            arrow_y = 0;
-            arrow_x = rand() % 5;
+        if (!lost) {
+            /* Pace the loop.  */
+            pacer_wait();
+            clear_screen();
+            navswitch_update();
+            button_task();
+
+            tinygl_init(PACER_RATE);
+            tinygl_font_set(&font5x7_1);
+            tinygl_text_speed_set(MESSAGE_RATE);
+            tinygl_text_mode_set(TINYGL_TEXT_MODE_SCROLL);
+
+            if (current_tick % arrow_speed == 0) {
+                arrow_y++;
+            }
+
+            if (arrow_y >= 7) {
+                arrow_y = 0;
+                arrow_x = rand() % 5;
+            }
+
+            if (current_tick >= 10000) {
+                current_tick = 0;
+            }
+
+            ledmat_pixel_set(arrow_x, arrow_y, 1);
+            // nav.h
+            move(arrow_x, arrow_y, &correctCount, &wrongMove);
+
+            if (correctCount == 2) {
+                led_set(LED1, 1);
+                sabotagePowerUp = true;
+                correctCount = 0;
+            }
+
+            current_tick++;
+
+        } else if (lost) {
+            // ADD LOSE SCREEN
+            tinygl_text("YOU LOSE!");
+            tinygl_update();
         }
-
-        if (current_tick >= 10000) {
-            current_tick = 0;
-        }
-
-        ledmat_pixel_set(arrow_x, arrow_y, 1);
-        // nav.h
-        move(arrow_x, arrow_y, &correctCount);
-
-        if (correctCount >= 0) {
-            led_set(LED1, 1);
-        }
-        if (correctCount == 0) {
-            led_set(LED1, 0);
-        }
-
-        current_tick++;
-
     }
 }
