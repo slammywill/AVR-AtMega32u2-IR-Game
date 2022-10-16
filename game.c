@@ -64,62 +64,67 @@ static void clear_screen(void) {
 }
 
 // ARROWS
-static void drawDownArrow(int draw, int yPos1, int yPos2) {
-    if (draw == 0) {
-        ledmat_pixel_set(2, yPos2, 0);
-        ledmat_pixel_set(1, yPos1, 1);
-        ledmat_pixel_set(3, yPos1, 1);
-    } else if (draw == 1) {
-        ledmat_pixel_set(2, yPos2, 1);
-        ledmat_pixel_set(1, yPos1, 0);
-        ledmat_pixel_set(3, yPos1, 0);
-    }
-}
+// static void drawDownArrow(int draw, int yPos1, int yPos2) {
+//     if (draw == 0) {
+//         ledmat_pixel_set(2, yPos2, 0);
+//         ledmat_pixel_set(1, yPos1, 1);
+//         ledmat_pixel_set(3, yPos1, 1);
+//     } else if (draw == 1) {
+//         ledmat_pixel_set(2, yPos2, 1);
+//         ledmat_pixel_set(1, yPos1, 0);
+//         ledmat_pixel_set(3, yPos1, 0);
+//     }
+// }
 
-static void drawUpArrow(int draw, int yPos1, int yPos2) {
-    if (draw == 0) {
-        ledmat_pixel_set(1, yPos2, 1);
-        ledmat_pixel_set(3, yPos2, 1);
-        ledmat_pixel_set(2, yPos1, 0);
-    }
-    else if (draw == 1) {
-        ledmat_pixel_set(2, yPos1, 1);
-        ledmat_pixel_set(1, yPos2, 0);
-        ledmat_pixel_set(3, yPos2, 0);
-    }
-}
+// static void drawUpArrow(int draw, int yPos1, int yPos2) {
+//     if (draw == 0) {
+//         ledmat_pixel_set(1, yPos2, 1);
+//         ledmat_pixel_set(3, yPos2, 1);
+//         ledmat_pixel_set(2, yPos1, 0);
+//     }
+//     else if (draw == 1) {
+//         ledmat_pixel_set(2, yPos1, 1);
+//         ledmat_pixel_set(1, yPos2, 0);
+//         ledmat_pixel_set(3, yPos2, 0);
+//     }
+// }
 
-// NOT DONE
-static void drawLeftArrow(int draw, int yPos1, int yPos2) {
-    if (draw == 0) {
-        ledmat_pixel_set(1, yPos2, 1);
-        ledmat_pixel_set(3, yPos2, 1);
-        ledmat_pixel_set(2, yPos1, 0);
-    }
-    else if (draw == 1) {
-        ledmat_pixel_set(2, yPos1, 1);
-        ledmat_pixel_set(1, yPos2, 0);
-        ledmat_pixel_set(3, yPos2, 0);
-    }
-}
+// // NOT DONE
+// static void drawLeftArrow(int draw, int yPos1, int yPos2) {
+//     if (draw == 0) {
+//         ledmat_pixel_set(1, yPos2, 1);
+//         ledmat_pixel_set(3, yPos2, 1);
+//         ledmat_pixel_set(2, yPos1, 0);
+//     }
+//     else if (draw == 1) {
+//         ledmat_pixel_set(2, yPos1, 1);
+//         ledmat_pixel_set(1, yPos2, 0);
+//         ledmat_pixel_set(3, yPos2, 0);
+//     }
+// }
 
-static void drawRightArrow(int draw, int yPos1, int yPos2) {
-    if (draw == 0) {
-        ledmat_pixel_set(1, yPos2, 1);
-        ledmat_pixel_set(3, yPos2, 1);
-        ledmat_pixel_set(2, yPos1, 0);
-    }
-    else if (draw == 1) {
-        ledmat_pixel_set(2, yPos1, 1);
-        ledmat_pixel_set(1, yPos2, 0);
-        ledmat_pixel_set(3, yPos2, 0);
-    }
-}
+// static void drawRightArrow(int draw, int yPos1, int yPos2) {
+//     if (draw == 0) {
+//         ledmat_pixel_set(1, yPos2, 1);
+//         ledmat_pixel_set(3, yPos2, 1);
+//         ledmat_pixel_set(2, yPos1, 0);
+//     }
+//     else if (draw == 1) {
+//         ledmat_pixel_set(2, yPos1, 1);
+//         ledmat_pixel_set(1, yPos2, 0);
+//         ledmat_pixel_set(3, yPos2, 0);
+//     }
+// }
+
+// void newArrow(void) {
+//     int x = rand() % 5
+// }
+
 
 // DRAW LINE
-static void drawLine(void) {
+// static void drawLine(void) {
     
-}
+// }
 
 int main(void)
 {
@@ -131,64 +136,84 @@ int main(void)
     /* Initialize  */
     pacer_init(LOOP_RATE);
 
-    int draw = 0;
-    int yPos1 = 0, yPos2 = 1;
-    bool arrowOnScreen = true;
+    // int draw = 0;
+    // int yPos1 = 0, yPos2 = 1;
+    // bool arrowOnScreen = true;
 
-    int wait = 0;
-    int speed = 100;
+    int delay = 1000;
+    int current_tick = 0;
+    int arrow_speed = 30;
+    // int speed = 100;
 
-    int waitRand = 0;
-    int randTime = 800;
-    int r = 0;
+    // int waitRand = 0;
+    // int randTime = 800;
+
+    int arrow_x = 0;
+    int arrow_y = 0;
 
     while (1)
     {
         /* Pace the loop.  */
         pacer_wait();
         clear_screen();
+        current_tick++;
 
-        // DRAW LINE
-        drawLine();
-
-        // DRAW ARROW
-
-        if (waitRand != randTime) {
-            waitRand++;
-        } else {
-            r = rand() % 3;
-            waitRand = 0;
-            arrowOnScreen = true;
+        if (current_tick % arrow_speed == 0) {
+            arrow_y++;
+        }
+        if (arrow_y >= 7) {
+            arrow_y = 0;
+            arrow_x = rand() % 5;
         }
 
-        if (arrowOnScreen) {
-            if (r == 0) 
-                drawDownArrow(draw, yPos1, yPos2);
-            else
-                drawUpArrow(draw, yPos1, yPos2);
-
-            if (draw == 2) {
-                draw = 0;
-            }
-            else {
-                draw++;
-            }
-
-
-            if (wait != speed) {
-                wait++;
-            }
-            else {
-                wait = 0;
-                if (yPos1 != 5) {
-                    yPos1++;
-                    yPos2++;
-                } else {
-                    yPos1 = 0, yPos2 = 1;
-                    arrowOnScreen = false;
-                }
-            }
+        if (current_tick >= 10000) {
+            current_tick = 0;
         }
+
+        ledmat_pixel_set(arrow_x, arrow_y, 1);
+
+
+        // // DRAW LINE
+        // // drawLine();
+
+        // // DRAW ARROW
+
+        // if (waitRand != randTime) {
+        //     waitRand++;
+        // } else {
+        //     r = rand() % 3;
+        //     waitRand = 0;
+        //     arrowOnScreen = true;
+        // }
+
+        // if (arrowOnScreen) {
+        //     if (r == 0) 
+        //         drawDownArrow(draw, yPos1, yPos2);
+        //     else
+        //         drawUpArrow(draw, yPos1, yPos2);
+
+        //     if (draw == 2) {
+        //         draw = 0;
+        //     }
+        //     else {
+        //         draw++;
+        //     }
+
+
+        //     if (wait != speed) {
+        //         wait++;
+        //     }
+        //     else {
+        //         wait = 0;
+        //         if (yPos1 != 5) {
+        //             yPos1++;
+        //             yPos2++;
+        //         } else {
+        //             yPos1 = 0, yPos2 = 1;
+        //             arrowOnScreen = false;
+        //         }
+        //     }
+        // }
 
         //tinygl_update();
     }
