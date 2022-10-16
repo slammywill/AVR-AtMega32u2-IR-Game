@@ -3,6 +3,6 @@
 
 #include "system.h"
 
-void move(int, int, int*);
+void move(int, int, int*, int*);
 
 #endif
