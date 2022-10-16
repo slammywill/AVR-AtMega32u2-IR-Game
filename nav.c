@@ -1,54 +1,68 @@
 #include "system.h"
 #include "navswitch.h"
+#include <stdio.h>
 
 #include "nav.h"
 
-void move(int arrow_x, int arrow_y, int* correctCount) {
+void move(int arrow_x, int arrow_y, int* correctCount, int* wrongMove) {
+
+    int y_check = 1;
 
     // LEFT
-    if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
-        if (arrow_y == 6 && arrow_x == 3) {
+    if (navswitch_push_event_p(NAVSWITCH_WEST)) {
+        if (arrow_y >= y_check && arrow_x == 0) {
             (*correctCount)++;
+            *wrongMove = 0;
         }
         else {
             *correctCount = 0;
-        }
-    }
-
-    // RIGHT
-    else if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
-        if (arrow_y == 6 && arrow_x == 1) {
-            (*correctCount)++;
-        }
-        else {
-            *correctCount = 0;
+            (*wrongMove)++;
         }
     }
     // LEFT-MIDDLE
-    else if (navswitch_push_event_p(NAVSWITCH_EAST)) {
-        if (arrow_y == 6 && arrow_x == 4) {
+    else if (navswitch_push_event_p(NAVSWITCH_NORTH)) {
+        if (arrow_y >= y_check && arrow_x == 1) {
             (*correctCount)++;
+            *wrongMove = 0;
         }
         else {
             *correctCount = 0;
+            (*wrongMove)++;
         }
     }
-    // RIGHT-MIDDLE
-    else if (navswitch_push_event_p(NAVSWITCH_WEST)) {
-        if (arrow_y == 6 && arrow_x == 0) {
-            (*correctCount)++;
-        }
-        else {
-            *correctCount = 0;
-        }
-    }
+
     // MIDDLE
     else if (navswitch_push_event_p(NAVSWITCH_PUSH)) {
-        if (arrow_y == 6 && arrow_x == 2) {
+        if (arrow_y >= y_check && arrow_x == 2) {
             (*correctCount)++;
+            *wrongMove = 0;
         }
         else {
             *correctCount = 0;
+            (*wrongMove)++;
+        }
+    }
+
+    // RIGHT-MIDDLE
+    else if (navswitch_push_event_p(NAVSWITCH_SOUTH)) {
+        if (arrow_y >= y_check && arrow_x == 3) {
+            (*correctCount)++;
+            *wrongMove = 0;
+        }
+        else {
+            *correctCount = 0;
+            (*wrongMove)++;
+        }
+    }
+    // RIGHT
+    else if (navswitch_push_event_p(NAVSWITCH_EAST)) {
+        if (arrow_y >= y_check && arrow_x == 4) {
+            (*correctCount)++;
+            *wrongMove = 0;
+        }
+        else {
+            *correctCount = 0;
+            (*wrongMove)++;
         }
     }
 }
