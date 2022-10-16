@@ -1,3 +1,7 @@
+/*
+* MAIN GAME FILE
+* AUTHORS: Zac Avis, Sam Willems
+*/
 #include "system.h"
 #include "pacer.h"
 #include "navswitch.h"
@@ -15,17 +19,20 @@
 #define LOOP_RATE 250
 #define PACER_RATE 500
 
+// PUTS THE ROWS OF LEDS INTO A LIST
 static pio_t ledmat_rows[] =
 {
     LEDMAT_ROW1_PIO, LEDMAT_ROW2_PIO, LEDMAT_ROW3_PIO, LEDMAT_ROW4_PIO,
     LEDMAT_ROW5_PIO, LEDMAT_ROW6_PIO, LEDMAT_ROW7_PIO
 };
+// PUTS THE COLUMNS OF LEDS INTO A LIST
 static pio_t ledmat_cols[] =
 {
     LEDMAT_COL1_PIO, LEDMAT_COL2_PIO, LEDMAT_COL3_PIO,
     LEDMAT_COL4_PIO, LEDMAT_COL5_PIO
 };
 
+// SET A PIXEL AT SPECIFIED COLUMN & ROW TO BE ON OR OFF
 static void ledmat_pixel_set(int col, int row, bool state)
 {
     if (state)
@@ -40,7 +47,7 @@ static void ledmat_pixel_set(int col, int row, bool state)
     }
 }
 
-/** Initialise LED matrix PIO pins.  */
+// INITIALISES LED MATRIX PIO PINS
 static void ledmat_init(void)
 {
     uint8_t row;
@@ -68,6 +75,7 @@ static void clear_screen(void) {
     }
 }
 
+// VARIABLES
 static int arrow_speed = 60;
 static bool sabotagePowerUp = false;
 
@@ -76,7 +84,7 @@ static void button_task_init(void)
     button_init();
 }
 
-
+// IF PLAYER HAS A POWER UP & PUSHES BUTTON THEN IT'LL SPEED OPPONENTS GAME UP
 static void button_task(void) {
     button_update();
 
@@ -92,16 +100,17 @@ int main(void)
 {
     system_init();
 
-    /* TODO: Initialise the pins of the LED matrix.  */
+    // INITIALISE
     ledmat_init();
     button_task_init();
-
-    /* Initialize  */
     pacer_init(LOOP_RATE);
+    tinygl_init(PACER_RATE);
+    tinygl_font_set(&font5x7_1);
+    tinygl_text_speed_set(MESSAGE_RATE);
+    tinygl_text_mode_set(TINYGL_TEXT_MODE_SCROLL);
 
-    int delay = 1000;
+    // VARIABLES
     int current_tick = 0;
-
     int arrow_x = 0;
     int arrow_y = 0;
 
@@ -111,23 +120,19 @@ int main(void)
 
     while (1)
     {
-
         if (wrongMove == 3) {
             lost = true;
         }
 
+        // RANDOMLY CHOOSES POSITION WHERE A DOT WILL FALL, 
         if (!lost) {
-            /* Pace the loop.  */
+            // PACE THE LOOP & CLEARS THE LOOP
             pacer_wait();
             clear_screen();
             navswitch_update();
             button_task();
 
-            tinygl_init(PACER_RATE);
-            tinygl_font_set(&font5x7_1);
-            tinygl_text_speed_set(MESSAGE_RATE);
-            tinygl_text_mode_set(TINYGL_TEXT_MODE_SCROLL);
-
+            // WAITS CERTAIN AMOUNT OF TIME THEN INCREASES y VALUE
             if (current_tick % arrow_speed == 0) {
                 arrow_y++;
             }
@@ -141,6 +146,7 @@ int main(void)
                 current_tick = 0;
             }
 
+            // SETS LED TO LOW
             ledmat_pixel_set(arrow_x, arrow_y, 1);
             // nav.h
             move(arrow_x, arrow_y, &correctCount, &wrongMove);
