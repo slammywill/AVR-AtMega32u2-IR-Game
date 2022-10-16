@@ -4,8 +4,11 @@
 
 #include "nav.h"
 
+// CHECKS TO SEE IF THE PLAYER HAS MADE A RIGHT MOVE OR A WRONG MOVE & ALSO 
+// CHECKS TO SEE HOW MANY WRONG MOVES THE PLAYER HAS MADE IN A ROW
 void move(int arrow_x, int arrow_y, int* correctCount, int* wrongMove) {
 
+    // VARIABLES
     int y_check = 1;
 
     // LEFT
