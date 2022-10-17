@@ -1,7 +1,7 @@
-# File:   Makefile
-# Author: Sam Willems
-# Date:   16/10/2022
-# Descr:  Makefile for game
+# MAKEFILE
+# AUTHORS: Sam Willems, Zac Avis
+# DATE:   16/10/2022
+# DESC:  Makefile for game
 
 # Definitions.
 CC = avr-gcc
