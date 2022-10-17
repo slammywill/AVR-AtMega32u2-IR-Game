@@ -11,12 +11,8 @@
 #include "../fonts/font5x7_1.h"
 #include "button.h"
 #include "pio.h"
-#include <stdlib.h>
-#include "tinygl.h"
-#include "../fonts/font5x7_1.h"
 
-#define MESSAGE_RATE 25
-#define LOOP_RATE 250
+#define LOOP_RATE 500
 #define PACER_RATE 500
 
 // PUTS THE ROWS OF LEDS INTO A LIST
@@ -101,13 +97,12 @@ int main(void)
     system_init();
 
     // INITIALISE
+    // ir_uart_init();
     ledmat_init();
     button_task_init();
     pacer_init(LOOP_RATE);
     tinygl_init(PACER_RATE);
     tinygl_font_set(&font5x7_1);
-    tinygl_text_speed_set(MESSAGE_RATE);
-    tinygl_text_mode_set(TINYGL_TEXT_MODE_SCROLL);
 
     // VARIABLES
     int current_tick = 0;
@@ -115,61 +110,76 @@ int main(void)
     int arrow_y = 0;
 
     int correctCount = 0;
+    int score = 0;
     int wrongMove = 0;
     bool gameOver = false;
     bool lost = false;
+    bool started = true;
 
     while (1)
     {
-        if (wrongMove == 3) {
-            gameOver = true;
-            lost = true;
-        }
+        // if (!started) {
+        //     ir_uart_putc('S');
+        //     char start = ir_uart_getc();
+        //     if (start == 'S') {
+        //         started = true;
+        //     }
+        // }
+        if (started) {
+            if (wrongMove == 3) {
+                gameOver = true;
+                lost = true;
+            }
 
-        // RANDOMLY CHOOSES POSITION WHERE A DOT WILL FALL, 
-        if (!gameOver) {
-            // PACE THE LOOP & CLEARS THE LOOP
+            // RANDOMLY CHOOSES POSITION WHERE A DOT WILL FALL,
+            if (!gameOver) {
+                // PACE THE LOOP & CLEARS THE LOOP
+                clear_screen();
+                navswitch_update();
+                button_task();
+                pacer_wait();
+
+                // WAITS CERTAIN AMOUNT OF TIME THEN INCREASES y VALUE
+                if (current_tick % arrow_speed == 0) {
+                    arrow_y++;
+                }
+
+                if (arrow_y >= 7) {
+                    arrow_y = 0;
+                    arrow_x = rand() % 5;
+                }
+
+                if (current_tick >= 10000) {
+                    current_tick = 0;
+                }
+
+                // SETS LED TO LOW
+                ledmat_pixel_set(arrow_x, arrow_y, 1);
+                // nav.h
+                move(arrow_x, arrow_y, &correctCount, &wrongMove, &score);
+
+                if (correctCount == 5) {
+                    led_set(LED1, 1);
+                    sabotagePowerUp = true;
+                    correctCount = 0;
+                }
+
+                current_tick++;
+            if (score == 50) {
+                gameOver = true;
+            }
+
+            } if (gameOver) {
+                // ADD LOSE SCREEN
+                if (lost) {
+                    tinygl_text("L");
+                }
+                else {
+                    tinygl_text("W");
+                }
+                tinygl_update();
+            }
             pacer_wait();
-            clear_screen();
-            navswitch_update();
-            button_task();
-
-            // WAITS CERTAIN AMOUNT OF TIME THEN INCREASES y VALUE
-            if (current_tick % arrow_speed == 0) {
-                arrow_y++;
-            }
-
-            if (arrow_y >= 7) {
-                arrow_y = 0;
-                arrow_x = rand() % 5;
-            }
-
-            if (current_tick >= 10000) {
-                current_tick = 0;
-            }
-
-            // SETS LED TO LOW
-            ledmat_pixel_set(arrow_x, arrow_y, 1);
-            // nav.h
-            move(arrow_x, arrow_y, &correctCount, &wrongMove);
-
-            if (correctCount == 2) {
-                led_set(LED1, 1);
-                sabotagePowerUp = true;
-                correctCount = 0;
-            }
-
-            current_tick++;
-
-        } else if (gameOver) {
-            // ADD LOSE SCREEN
-            if (lost) {
-                tinygl_text("YOU LOSE!");
-            }
-            else {
-                tinygl_text("YOU WIN!");
-            }
-            tinygl_update();
         }
     }
 }
