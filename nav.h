@@ -8,7 +8,6 @@
 #define NAV_H
 #include "system.h"
 
-int x;
 void move(int, int, int*, int*, int*);
 
 #endif
