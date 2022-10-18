@@ -16,6 +16,7 @@
 
 #define LOOP_RATE 500
 #define PACER_RATE 500
+#define WINCOUNT 15
 
 // PUTS THE ROWS OF LEDS INTO A LIST
 static pio_t ledmat_rows[] =
@@ -177,8 +178,8 @@ int main(void) {
                     correctCount = 0;
                 }
 
-                // IF SCORE IS 50 YOU WIN
-                if (score == 50) {
+                // IF SCORE IS WINCOUNT YOU WIN
+                if (score == WINCOUNT) {
                     ir_uart_putc('F');
                     gameOver = true;
                 }
