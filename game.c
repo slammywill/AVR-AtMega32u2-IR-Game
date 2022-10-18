@@ -13,6 +13,8 @@
 #include "../fonts/font5x7_1.h"
 #include "button.h"
 #include "pio.h"
+#include <stdlib.h>
+#include "led.h"
 
 #define LOOP_RATE 500
 #define PACER_RATE 500
