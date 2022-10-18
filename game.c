@@ -120,18 +120,6 @@ int main(void) {
 
     while (1)
     {
-
-        // SENDS IR TO SEE IF BOTH PLAYERS ARE READY
-        if (!started) {
-            ir_uart_putc('S');
-            if (ir_uart_read_ready_p()) {
-                char start_ir_received = ir_uart_getc();
-                if (start_ir_received == 'S') {
-                    started = true;
-                }
-            }
-        }
-
         // BOTH PLAYERS ARE READY SO START THE GAME
         if (started) {
 
