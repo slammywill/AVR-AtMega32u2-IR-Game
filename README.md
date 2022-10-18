@@ -1,5 +1,5 @@
 # AUTHORS
-    Sam Willems, Zach Avis
+    Sam Willems, Zac Avis
 # DATE
     17/10/2022
 
