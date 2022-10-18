@@ -128,8 +128,7 @@ int main(void) {
                 char ir_received = ir_uart_getc();
                 if (ir_received == 'P') {
                     arrow_speed = arrow_speed - (arrow_speed / 10);
-                }
-                else if (ir_received == 'F') {
+                } else if (ir_received == 'F') {
                     gameOver = true;
                 } else if (ir_received == 'W') {
                     lost = true;
