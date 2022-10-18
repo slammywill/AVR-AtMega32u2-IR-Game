@@ -16,7 +16,7 @@
 
 #define LOOP_RATE 500
 #define PACER_RATE 500
-#define WINCOUNT 25
+#define WINCOUNT 50
 
 // PUTS THE ROWS OF LEDS INTO A LIST
 static pio_t ledmat_rows[] =
