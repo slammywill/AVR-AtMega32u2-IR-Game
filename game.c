@@ -1,7 +1,9 @@
 /*
 * MAIN GAME FILE
 * AUTHORS: Zac Avis, Sam Willems
+* DESC: Main game file
 */
+
 #include "system.h"
 #include "pacer.h"
 #include "navswitch.h"
@@ -64,44 +66,42 @@ static void ledmat_init(void)
 
 // CLEAR SCREEN
 static void clear_screen(void) {
+
     for (int i = 0; i < 7; i++) {
         for (int x = 0; x < 5; x++) {
             ledmat_pixel_set(x, i, 0);
         }
     }
+
 }
 
 // VARIABLES
 static int arrow_speed = 60;
 static bool sabotagePowerUp = false;
 
-static void button_task_init(void)
-{
-    button_init();
-}
-
 // IF PLAYER HAS A POWER UP & PUSHES BUTTON THEN IT'LL SPEED OPPONENTS GAME UP
 static void button_task(void) {
+
     button_update();
 
     if (button_push_event_p(BUTTON1) && sabotagePowerUp) {
-        arrow_speed = arrow_speed - (arrow_speed / 20);
+        ir_uart_putc('P');
         sabotagePowerUp = false;
         led_set(LED1, 0);
     }
+
 }
 
-
-int main(void)
-{
-    system_init();
+// MAIN
+int main(void) {
 
     // INITIALISE
-    // ir_uart_init();
+    system_init();
+    ir_uart_init();
     ledmat_init();
-    button_task_init();
-    pacer_init(LOOP_RATE);
-    tinygl_init(PACER_RATE);
+    button_init();
+    pacer_init(PACER_RATE);
+    tinygl_init(LOOP_RATE);
     tinygl_font_set(&font5x7_1);
 
     // VARIABLES
@@ -112,45 +112,57 @@ int main(void)
     int correctCount = 0;
     int score = 0;
     int wrongMove = 0;
+
     bool gameOver = false;
     bool lost = false;
     bool started = true;
 
     while (1)
     {
-        // if (!started) {
-        //     ir_uart_putc('S');
-        //     char start = ir_uart_getc();
-        //     if (start == 'S') {
-        //         started = true;
-        //     }
-        // }
+
+        // SENDS IR TO SEE IF BOTH PLAYERS ARE READY
+        if (!started) {
+            ir_uart_putc('S');
+            char start_ir_received = ir_uart_getc();
+            if (ir_uart_read_ready_p()) {
+                if (start_ir_received == 'S') {
+                    started = true;
+                }
+            }
+        }
+
+        // BOTH PLAYERS ARE READY SO START THE GAME
         if (started) {
+
+            // RECEIVE IR FROM OPPONENT
+            if (ir_uart_read_ready_p()) {
+                char ir_received = ir_uart_getc();
+                if (ir_received == 'P') {
+                    arrow_speed = arrow_speed - (arrow_speed / 10);
+                }
+                else if (ir_received == 'F') {
+                    gameOver = true;
+                }
+            }
+
+            // ENDS GAME & SENDS IR TO OPPONENT TO END THEIR GAME
             if (wrongMove == 3) {
+                ir_uart_putc('F');
                 gameOver = true;
                 lost = true;
             }
 
             // RANDOMLY CHOOSES POSITION WHERE A DOT WILL FALL,
             if (!gameOver) {
-                // PACE THE LOOP & CLEARS THE LOOP
+                // PACES LOOP, CLEARS THE LOOP, UPDATES NAV SWITCH & BUTTON
+                pacer_wait();
                 clear_screen();
                 navswitch_update();
                 button_task();
-                pacer_wait();
 
                 // WAITS CERTAIN AMOUNT OF TIME THEN INCREASES y VALUE
                 if (current_tick % arrow_speed == 0) {
                     arrow_y++;
-                }
-
-                if (arrow_y >= 7) {
-                    arrow_y = 0;
-                    arrow_x = rand() % 5;
-                }
-
-                if (current_tick >= 10000) {
-                    current_tick = 0;
                 }
 
                 // SETS LED TO LOW
@@ -158,19 +170,32 @@ int main(void)
                 // nav.h
                 move(arrow_x, arrow_y, &correctCount, &wrongMove, &score);
 
+                // IF YOU GET 5 CORRECT MOVES IN A ROW THEN YOU GET A POWER UP TO SPEED UP OPPONENTS GAME
                 if (correctCount == 5) {
                     led_set(LED1, 1);
                     sabotagePowerUp = true;
                     correctCount = 0;
                 }
 
-                current_tick++;
-            if (score == 50) {
-                gameOver = true;
-            }
+                // IF SCORE IS 50 YOU WIN
+                if (score == 50) {
+                    ir_uart_putc('F');
+                    gameOver = true;
+                }
 
+                //  IF ARROW IS MORE THAN OR EQUAL TO 7 ADD ANOTHER ARROW AT A RANDOM LOCATION 
+                if (arrow_y >= 7) {
+                    arrow_y = 0;
+                    arrow_x = rand() % 5;
+                }
+
+                current_tick++;
+                if (current_tick >= 10000) {
+                    current_tick = 0;
+                }
+
+            // IF GAME IS OVER, DISPLAYS 'W' IF YOU WIN, 'L' IF YOU LOSE
             } if (gameOver) {
-                // ADD LOSE SCREEN
                 if (lost) {
                     tinygl_text("L");
                 }
@@ -179,7 +204,6 @@ int main(void)
                 }
                 tinygl_update();
             }
-            pacer_wait();
         }
     }
 }
