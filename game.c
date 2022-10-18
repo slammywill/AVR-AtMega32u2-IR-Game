@@ -77,7 +77,7 @@ static void clear_screen(void) {
 }
 
 // VARIABLES
-static int arrow_speed = 60;
+static int arrow_speed = 100;
 static bool sabotagePowerUp = false;
 
 // IF PLAYER HAS A POWER UP & PUSHES BUTTON THEN IT'LL SPEED OPPONENTS GAME UP
@@ -124,8 +124,8 @@ int main(void) {
         // SENDS IR TO SEE IF BOTH PLAYERS ARE READY
         if (!started) {
             ir_uart_putc('S');
-            char start_ir_received = ir_uart_getc();
             if (ir_uart_read_ready_p()) {
+                char start_ir_received = ir_uart_getc();
                 if (start_ir_received == 'S') {
                     started = true;
                 }
