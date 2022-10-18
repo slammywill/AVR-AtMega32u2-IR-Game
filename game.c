@@ -131,6 +131,9 @@ int main(void) {
                 }
                 else if (ir_received == 'F') {
                     gameOver = true;
+                } else if (ir_received == 'W') {
+                    lost = true;
+                    gameOver = true;
                 }
             }
 
@@ -168,7 +171,7 @@ int main(void) {
 
                 // IF SCORE IS WINCOUNT YOU WIN
                 if (score == WINCOUNT) {
-                    ir_uart_putc('F');
+                    ir_uart_putc('W');
                     gameOver = true;
                 }
 
