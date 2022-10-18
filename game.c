@@ -16,7 +16,7 @@
 
 #define LOOP_RATE 500
 #define PACER_RATE 500
-#define WINCOUNT 15
+#define WINCOUNT 25
 
 // PUTS THE ROWS OF LEDS INTO A LIST
 static pio_t ledmat_rows[] =
@@ -172,7 +172,7 @@ int main(void) {
                 move(arrow_x, arrow_y, &correctCount, &wrongMove, &score);
 
                 // IF YOU GET 5 CORRECT MOVES IN A ROW THEN YOU GET A POWER UP TO SPEED UP OPPONENTS GAME
-                if (correctCount == 5) {
+                if (correctCount == 3) {
                     led_set(LED1, 1);
                     sabotagePowerUp = true;
                     correctCount = 0;
